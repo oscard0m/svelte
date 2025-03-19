@@ -62,43 +62,8 @@ jobs:
       - name: build and check generated types
         if: (${{ success() }} || ${{ failure() }}) # ensures this step runs even if previous steps fail
         run: pnpm build && { [ "`git status --porcelain=v1`" == "" ] || (echo "Generated types have changed — please regenerate types locally with `cd packages/svelte && pnpm generate:types` and commit the changes after you have reviewed them"; git diff; exit 1); }
-      - name: bundle
-        run: |
-          NODE_ENV=production pnpx esbuild \
-          ./packages/svelte/src/index-client.js \
-          ./packages/svelte/src/animate/index.js \
-          ./packages/svelte/src/internal/client/index.js \
-          ./packages/svelte/src/internal/disclose-version.js \
-          ./packages/svelte/src/internal/flags/legacy.js \
-          ./packages/svelte/src/internal/flags/tracing.js \
-          ./packages/svelte/src/legacy/legacy-client.js \
-          ./packages/svelte/src/motion/index.js \
-          ./packages/svelte/src/reactivity/index-client.js \
-          ./packages/svelte/src/reactivity/window/index.js \
-          ./packages/svelte/src/store/index-client.js \
-          ./packages/svelte/src/transition/index.js \
-          ./packages/svelte/src/events/index.js \
-          --bundle \
-          --format=esm \
-          --outdir=packages/svelte/dist \
-          --minify \
-          --platform=browser
-          NODE_ENV=production pnpx esbuild \
-          ./packages/svelte/src/index-server.js \
-          ./packages/svelte/src/compiler/index.js \
-          ./packages/svelte/src/internal/index.js \
-          ./packages/svelte/src/internal/server/index.js \
-          ./packages/svelte/src/legacy/legacy-server.js \
-          ./packages/svelte/src/reactivity/index-server.js \
-          ./packages/svelte/src/server/index.js \
-          ./packages/svelte/src/store/index-server.js \
-          --bundle \
-          --format=esm \
-          --outdir=packages/svelte/dist \
-          --minify \
-          --platform=node
       - name: gravity
-        run: pnpx @gravityci/cli 'packages/svelte/dist/**/*'
+        run: pnpx @gravityci/cli 'packages/svelte/compiler/**/*.js'
         env:
           GRAVITY_TOKEN: ${{ secrets.GRAVITY_TOKEN }}
 
