@@ -62,6 +62,13 @@ jobs:
       - name: build and check generated types
         if: (${{ success() }} || ${{ failure() }}) # ensures this step runs even if previous steps fail
         run: pnpm build && { [ "`git status --porcelain=v1`" == "" ] || (echo "Generated types have changed — please regenerate types locally with `cd packages/svelte && pnpm generate:types` and commit the changes after you have reviewed them"; git diff; exit 1); }
+      - name: bundle
+        run: pnpx esbuild ./packages/svelte/src/index-client.js --bundle --format=esm --outfile=packages/svelte/dist/index-client.js
+      - name: gravity
+        run: pnpx @gravityci/cli 'packages/svelte/compiler/**/*.js' 'packages/svelte/dist/index-client.js'
+        env:
+          GRAVITY_TOKEN: ${{ secrets.GRAVITY_TOKEN }}
+
   Benchmarks:
     permissions: {}
     runs-on: ubuntu-latest
